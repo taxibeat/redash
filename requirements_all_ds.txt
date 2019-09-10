@@ -1,3 +1,7 @@
+####### add numpy/pandas pinned version last to support python 2.7
+numpy==1.16.5
+pandas==0.24.2
+#######
 google-api-python-client==1.5.1
 gspread==0.6.2
 impyla==0.10.0

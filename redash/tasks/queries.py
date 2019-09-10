@@ -187,7 +187,7 @@ def refresh_queries():
 
                 enqueue_query(query_text, query.data_source, query.user_id,
                               scheduled_query=query,
-                              metadata={'Query ID': query.id, 'Username': 'Scheduled'})
+                              metadata={'Query ID': query.id, 'Username': models.User.get_email_by_id(query.user_id)})
 
                 query_ids.append(query.id)
                 outdated_queries_count += 1

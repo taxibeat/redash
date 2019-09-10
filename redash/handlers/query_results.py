@@ -6,7 +6,7 @@ from flask_login import current_user
 from flask_restful import abort
 from redash import models, settings
 from redash.handlers.base import BaseResource, get_object_or_404
-from redash.permissions import (has_access, not_view_only, require_access,
+from redash.permissions import (has_access, has_access_torun, not_view_only, require_access,
                                 require_permission, view_only)
 from redash.tasks import QueryTask
 from redash.tasks.queries import enqueue_query
@@ -204,7 +204,7 @@ class QueryResultResource(BaseResource):
 
         allow_executing_with_view_only_permissions = query.parameterized.is_safe
 
-        if has_access(query.data_source.groups, self.current_user, allow_executing_with_view_only_permissions):
+        if has_access_torun(query.data_source.groups, self.current_user, allow_executing_with_view_only_permissions):
             return run_query(query.parameterized, parameters, query.data_source, query_id, max_age)
         else:
             return {'job': {'status': 4, 'error': 'You do not have permission to run queries with this data source.'}}, 403

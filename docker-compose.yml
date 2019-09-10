@@ -40,6 +40,8 @@ services:
     # The following turns the DB into less durable, but gains significant performance improvements for the tests run (x3
     # improvement on my personal machine). We should consider moving this into a dedicated Docker Compose configuration for
     # tests.
+    volumes:
+      - ./tests/testdb.sql:/docker-entrypoint-initdb.d/testdb.sql
     ports:
       - "15432:5432"
     command: "postgres -c fsync=off -c full_page_writes=off -c synchronous_commit=OFF"

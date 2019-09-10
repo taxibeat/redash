@@ -13,6 +13,25 @@ ACCESS_TYPE_DELETE = 'delete'
 
 ACCESS_TYPES = (ACCESS_TYPE_VIEW, ACCESS_TYPE_MODIFY, ACCESS_TYPE_DELETE)
 
+def has_access_torun(object_groups, user, need_view_only):
+    if 'admin' in user.permissions:
+        return True
+
+    matching_groups = set(object_groups.keys()).intersection(user.group_ids)
+
+    if not matching_groups:
+        return False
+
+    # ADD control if only default group overlapping
+    if len(matching_groups) == 1 and str(list(matching_groups)[0]) == '2':
+        return False
+
+    required_level = 1 if need_view_only else 2
+
+    group_level = 1 if all(flatten([object_groups[group] for group in matching_groups])) else 2
+
+    return required_level <= group_level
+
 
 def has_access(object_groups, user, need_view_only):
     if 'admin' in user.permissions:
