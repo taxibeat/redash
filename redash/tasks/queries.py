@@ -91,7 +91,7 @@ class QueryTask(object):
         return self._async_result.ready()
 
     def cancel(self):
-        return self._async_result.revoke(terminate=True, signal='SIGINT')
+        return self._async_result.revoke(terminate=True, signal='SIGKILL')
 
 
 def enqueue_query(query, data_source, user_id, scheduled_query=None, metadata={}):
