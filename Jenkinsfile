@@ -15,7 +15,7 @@ node {
 
     if (env.BRANCH_NAME == "master-beat-v7") {
       stage('Build Redash Image') {
-        redashImage = docker.build("registry.bigdata-crossregion.thebeat.co/beat/redash:v7.0.1-beat","--no-cache .")
+        redashImage = docker.build("registry.bigdata-crossregion.thebeat.co/beat/redash:v7.0.2-beat","--no-cache .")
       }
 
       stage('Push Redash Image') {
