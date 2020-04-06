@@ -1,48 +1,72 @@
-node {
+def sendNotification(String branch, String status) {
+  statusColor = '#E01563';
+  jobName = "${env.JOB_NAME}".split('/')[0]
+  if (status == 'SUCCESS') {
+    statusColor = '#3EB991';
+  }
+  slackSend (
+    color: statusColor,
+    channel: "#bdsys-ci",
+    message: "*${status}:* [${jobName}] Job `${env.JOB_NAME}` build `${env.BUILD_NUMBER}` finished.\nMore info at: ${env.BUILD_URL}"
+  )
+}
 
-  try {
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins-slave
+spec:
+  containers:
+    - name: docker
+      image: docker:18.06.3
+      tty: true
+      env:
+        - name: DOCKER_HOST
+          value: tcp://localhost:2375
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 1G
+          cpu: 1000m
+    - name: docker-daemon
+      image: docker:18.06.3-dind
+      securityContext:
+        privileged: true
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: ""
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 2G
+          cpu: 1000m     
+'''
+    }
+  }
 
-    stage('Clone Repo') {
-      checkout scm
+  stages {
+    stage('Build Redash Image') {
+      when {
+        branch 'master-beat-v7'
+      }
+      steps {
+        container('docker') {
+          sh 'docker build -t registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT} .'
+          sh 'docker tag registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT} registry.bigdata.thebeat.co/beat/redash:latest'
+          sh 'docker push registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT}'
+          sh 'docker push registry.bigdata.thebeat.co/beat/redash:latest'
+        }
+      }
     }
 
-    // REMOVE TESTS until needed
-    // if (env.BRANCH_NAME != "master-beat-v7") {
-    //   stage('Test') {
-    //     sh 'make tests'
-    //   }
-    // }
-
-    if (env.BRANCH_NAME == "master-beat-v7") {
-      stage('Build Redash Image') {
-        redashImage = docker.build("registry.bigdata-crossregion.thebeat.co/beat/redash:v7.0.2-beat","--no-cache .")
-      }
-
-      stage('Push Redash Image') {
-        redashImage.push()
-      }
-
-    }
-
-    deploymentStatus = 'SUCCESS'
-    slackColor = '#3EB991'
-
-  } catch(e) {
-
-    deploymentStatus = 'FAILURE'
-    slackColor = '#E01563'
-    throw e
-
-  } finally {
-
-      if (env.BRANCH_NAME == "master-beat-v7") {
-        slackSend (channel: '#bdsys-ci', color: "${slackColor}", message: "${deploymentStatus}: Repository redash - merge to master-beat-v7 is successful. Image registry.bigdata-crossregion.thebeat.co/beat/redash:v7.0.1-beat build")
-      }
-      // else if (env.BRANCH_NAME != "master-beat-v7") {
-      //   slackSend (channel: '#bdsys-ci', color: "${slackColor}", message: "${deploymentStatus}: Repository redash - tests for branch ${env.BRANCH_NAME}")
-      // }
-      // sh 'docker-compose down || /bin/true '
-      deleteDir()
   }
 
 }
