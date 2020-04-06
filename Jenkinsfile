@@ -43,10 +43,10 @@ spec:
           value: ""
       resources:
         requests:
-          memory: 128Mi
+          memory: 4G
           cpu: 100m
         limits:
-          memory: 2G
+          memory: 4G
           cpu: 1000m     
 '''
     }
