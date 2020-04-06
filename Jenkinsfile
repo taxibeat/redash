@@ -59,10 +59,10 @@ spec:
       }
       steps {
         container('docker') {
-          sh 'docker build -t registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT} .'
-          sh 'docker tag registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT} registry.bigdata.thebeat.co/beat/redash:latest'
-          sh 'docker push registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT}'
-          sh 'docker push registry.bigdata.thebeat.co/beat/redash:latest'
+          sh "docker build -t registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT} ."
+          sh "docker tag registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT} registry.bigdata.thebeat.co/beat/redash:latest"
+          sh "docker push registry.bigdata.thebeat.co/beat/redash:${env.GIT_COMMIT}"
+          sh "docker push registry.bigdata.thebeat.co/beat/redash:latest"
         }
       }
     }
