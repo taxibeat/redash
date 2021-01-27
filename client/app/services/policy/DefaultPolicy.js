@@ -1,12 +1,11 @@
-import { isArray } from 'lodash';
-import { $q } from '@/services/ng';
-import { currentUser, clientConfig } from '@/services/auth';
+import { isArray } from "lodash";
+import { currentUser, clientConfig } from "@/services/auth";
 
 /* eslint-disable class-methods-use-this */
 
 export default class DefaultPolicy {
   refresh() {
-    return $q.resolve(this);
+    return Promise.resolve(this);
   }
 
   canCreateDataSource() {
@@ -17,12 +16,20 @@ export default class DefaultPolicy {
     return currentUser.isAdmin;
   }
 
+  canCreateDestination() {
+    return currentUser.isAdmin;
+  }
+
+  isCreateDestinationEnabled() {
+    return currentUser.isAdmin;
+  }
+
   canCreateDashboard() {
-    return currentUser.hasPermission('create_dashboard');
+    return currentUser.hasPermission("create_dashboard");
   }
 
   isCreateDashboardEnabled() {
-    return currentUser.hasPermission('create_dashboard');
+    return currentUser.hasPermission("create_dashboard");
   }
 
   canCreateAlert() {
@@ -35,6 +42,10 @@ export default class DefaultPolicy {
 
   isCreateUserEnabled() {
     return currentUser.isAdmin;
+  }
+
+  isCreateQuerySnippetEnabled() {
+    return true;
   }
 
   getDashboardRefreshIntervals() {

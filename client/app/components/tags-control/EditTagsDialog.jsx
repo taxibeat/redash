@@ -1,9 +1,9 @@
-import { map, trim, uniq } from 'lodash';
-import React from 'react';
-import PropTypes from 'prop-types';
-import Select from 'antd/lib/select';
-import Modal from 'antd/lib/modal';
-import { wrap as wrapDialog, DialogPropType } from '@/components/DialogWrapper';
+import { map, trim, uniq, compact } from "lodash";
+import React from "react";
+import PropTypes from "prop-types";
+import Select from "antd/lib/select";
+import Modal from "antd/lib/modal";
+import { wrap as wrapDialog, DialogPropType } from "@/components/DialogWrapper";
 
 class EditTagsDialog extends React.Component {
   static propTypes = {
@@ -27,10 +27,10 @@ class EditTagsDialog extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getAvailableTags().then((availableTags) => {
+    this.props.getAvailableTags().then(availableTags => {
       this.setState({
         loading: false,
-        availableTags: uniq(map(availableTags, trim)),
+        availableTags: uniq(compact(map(availableTags, trim))),
       });
     });
   }
@@ -44,18 +44,19 @@ class EditTagsDialog extends React.Component {
         onOk={() => dialog.close(result)}
         title="Add/Edit Tags"
         className="shortModal"
-      >
+        wrapProps={{ "data-test": "EditTagsDialog" }}>
         <Select
           mode="tags"
           className="w-100"
           placeholder="Add some tags..."
           defaultValue={result}
-          onChange={values => this.setState({ result: map(values, trim) })}
+          onChange={values => this.setState({ result: compact(map(values, trim)) })}
           autoFocus
           disabled={loading}
-          loading={loading}
-        >
-          {map(availableTags, tag => <Select.Option key={tag}>{tag}</Select.Option>)}
+          loading={loading}>
+          {map(availableTags, tag => (
+            <Select.Option key={tag}>{tag}</Select.Option>
+          ))}
         </Select>
       </Modal>
     );
