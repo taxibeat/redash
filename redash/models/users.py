@@ -206,6 +206,11 @@ class User(
         return myuser.email
 
     @classmethod
+    def get_email_by_id(cls, _id):
+        myuser = cls.query.filter(cls.id == _id).one()
+        return myuser.email
+
+    @classmethod
     def get_by_api_key_and_org(cls, api_key, org):
         return cls.get_by_org(org).filter(cls.api_key == api_key).one()
 
