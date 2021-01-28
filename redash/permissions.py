@@ -13,12 +13,14 @@ ACCESS_TYPE_DELETE = "delete"
 
 ACCESS_TYPES = (ACCESS_TYPE_VIEW, ACCESS_TYPE_MODIFY, ACCESS_TYPE_DELETE)
 
-
-def has_access(obj, user, need_view_only):
+# Add a fourth parameter that default to False. This way we don't interfere with Redash's has_access default behavior.
+# We set this parameter true only in one case (redash/handlers/query_results.py#L290). 
+# More information on README.md file (section Beat Customization)
+def has_access(obj, user, need_view_only, beat_ro_access = False):
     if hasattr(obj, "api_key") and user.is_api_user():
         return has_access_to_object(obj, user.id, need_view_only)
     else:
-        return has_access_to_groups(obj, user, need_view_only)
+        return has_access_to_groups(obj, user, need_view_only, beat_ro_access)
 
 
 def has_access_to_object(obj, api_key, need_view_only):
@@ -30,8 +32,9 @@ def has_access_to_object(obj, api_key, need_view_only):
     else:
         return False
 
-
-def has_access_to_groups(obj, user, need_view_only):
+# Add a fourth parameter that default to False. This way we don't interfere with Redash's has_access_to_groups default behavior.
+# More information on README.md file (section Beat Customization)
+def has_access_to_groups(obj, user, need_view_only,beat_ro_access = False):
     groups = obj.groups if hasattr(obj, "groups") else obj
 
     if "admin" in user.permissions:
@@ -42,6 +45,10 @@ def has_access_to_groups(obj, user, need_view_only):
     if not matching_groups:
         return False
 
+    # Add if only default group overlapping don't allow refresh
+    if beat_ro_access == True and len(matching_groups) == 1 and str(list(matching_groups)[0]) == '2':
+        return False
+    
     required_level = 1 if need_view_only else 2
 
     group_level = 1 if all(flatten([groups[group] for group in matching_groups])) else 2
