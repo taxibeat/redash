@@ -288,7 +288,7 @@ class QueryResultResource(BaseResource):
         allow_executing_with_view_only_permissions = query.parameterized.is_safe
 
         if has_access(
-            query, self.current_user, allow_executing_with_view_only_permissions
+            query, self.current_user, allow_executing_with_view_only_permissions, True
         ):
             return run_query(
                 query.parameterized,
