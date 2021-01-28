@@ -53,7 +53,7 @@ spec:
   }
 
   stages {
-    stage('Build Redash Image') {
+    stage('Build Redash 7 Image') {
       when {
         branch 'master-beat-v7'
       }
@@ -67,6 +67,20 @@ spec:
       }
     }
 
+    stage('Build Redash 9 Image') {
+    when {
+        branch 'master-beat-v9'
+      }
+      steps {
+        container('docker') {
+          sh "docker build -t harbor.mgmt.bigdata.thebeat.co/beat-bigdata/redash:${env.GIT_COMMIT} ."
+          sh "docker tag harbor.mgmt.bigdata.thebeat.co/beat-bigdata/redash:${env.GIT_COMMIT} harbor.mgmt.bigdata.thebeat.co/beat-bigdata/redash:v9.0.0 harbor.mgmt.bigdata.thebeat.co/beat-bigdata/redash:latest"
+          sh "docker push harbor.mgmt.bigdata.thebeat.co/beat-bigdata/redash:${env.GIT_COMMIT}"
+          sh "docker push harbor.mgmt.bigdata.thebeat.co/beat-bigdata/redash:v9.0.0"
+          sh "docker push harbor.mgmt.bigdata.thebeat.co/beat-bigdata/redash:latest"
+        }
+      }
+    }
   }
 
 }
