@@ -16,7 +16,7 @@ ACCESS_TYPES = (ACCESS_TYPE_VIEW, ACCESS_TYPE_MODIFY, ACCESS_TYPE_DELETE)
 # Add a fourth parameter that default to False. This way we don't interfere with Redash's has_access default behavior.
 # We set this parameter true only in one case (redash/handlers/query_results.py#L290). 
 # More information on README.md file (section Beat Customization)
-def has_access(obj, user, need_view_only, beat_ro_access=False):
+def has_access(obj, user, need_view_only, beat_ro_access = False):
     if hasattr(obj, "api_key") and user.is_api_user():
         return has_access_to_object(obj, user.id, need_view_only)
     else:
