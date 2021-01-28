@@ -95,3 +95,22 @@ Please email security@redash.io to report any security vulnerabilities. We will 
 ## License
 
 BSD-2-Clause.
+
+# Beat Customization
+
+In adition to Redash functionalities we have made the following changes:
+
+1. We have [enabled Redash](redash/tasks/queries/maintenance.py#L91) to report users' emails on scheduled queries
+
+2. We have disallowed access to refresh queries for users that share queries but do not belong to the same team.
+
+To achieve this have modified [redash/permissions.py#L45](redash/permissions.py) file.
+
+In the following [piece of code](redash/permissions.py#L45) 
+
+```python
+    if beat_ro_access == False and len(matching_groups) == 1 and str(list(matching_groups)[0]) == '2':
+        return False 
+``` 
+
+we block users from being able refresh queries that belong to other users when users' only common group is the `default` (`2`) one.
